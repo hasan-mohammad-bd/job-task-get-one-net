@@ -1,13 +1,15 @@
-import "./App.css";
+import { Toaster } from "sonner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes/routes";
 
-function App() {
-  return (
-    <>
-      <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-    </>
-  );
-}
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <Toaster />
+    <RouterProvider router={router} />
+  </QueryClientProvider>
+);
 
 export default App;
