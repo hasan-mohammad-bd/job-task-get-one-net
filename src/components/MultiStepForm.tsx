@@ -76,7 +76,6 @@ const MultiStepForm = () => {
     const updatedEntries = [newEntry, ...submittedEntries];
     setSubmittedEntries(updatedEntries);
     saveSubmittedEntry(newEntry);
-
     setFormData(initialFormData);
     clearFormData();
     setCurrentStep(1);

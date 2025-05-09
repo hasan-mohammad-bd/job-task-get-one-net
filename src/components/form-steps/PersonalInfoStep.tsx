@@ -31,7 +31,7 @@ const PersonalInfoStep = ({
     },
   });
 
-  // Reset form values when formData changes (e.g. when loaded from localStorage)
+ 
   useEffect(() => {
     if (formData.name || formData.email) {
       form.reset({
