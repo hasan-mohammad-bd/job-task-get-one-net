@@ -1,14 +1,17 @@
-import { useState } from "react";
-import type { FormData, FormErrors } from "../../types/form-types";
-import { validatePersonalInfo } from "../../utils/form-validation";
-import { Label } from "../ui/Label";
+import { useForm } from "react-hook-form";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { useEffect } from "react";
+import type { FormData } from "../../types/form-types";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/button";
-// import { FormData, FormErrors } from "@/types/form-types";
-// import { validatePersonalInfo } from "@/utils/form-validation";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/custom/Label";
-// import { Button } from "@/components/ui/custom/Button";
 
 interface PersonalInfoStepProps {
   formData: FormData;
@@ -21,95 +24,81 @@ const PersonalInfoStep = ({
   updateFormData,
   onNext,
 }: PersonalInfoStepProps) => {
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState({
-    name: false,
-    email: false,
+  const form = useForm<Pick<FormData, "name" | "email">>({
+    defaultValues: {
+      name: formData.name || "",
+      email: formData.email || "",
+    },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    updateFormData({ [name]: value });
-    
-    if (touched[name as keyof typeof touched]) {
-      const validationResult = validatePersonalInfo({
-        ...formData,
-        [name]: value,
+  // Reset form values when formData changes (e.g. when loaded from localStorage)
+  useEffect(() => {
+    if (formData.name || formData.email) {
+      form.reset({
+        name: formData.name,
+        email: formData.email,
       });
-      setErrors((prev) => ({ ...prev, [name]: validationResult[name as keyof FormErrors] }));
     }
-  };
+  }, [formData, form]);
 
-  const handleBlur = (field: keyof typeof touched) => {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-    const validationResult = validatePersonalInfo(formData);
-    setErrors((prev) => ({ ...prev, [field]: validationResult[field] }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const validationResult = validatePersonalInfo(formData);
-    setErrors(validationResult);
-    setTouched({ name: true, email: true });
-    
-    if (Object.keys(validationResult).length === 0) {
-      onNext();
-    }
+  const handleSubmit = (data: Pick<FormData, "name" | "email">) => {
+    updateFormData(data);
+    onNext();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Personal Information</h2>
-        <p className="text-gray-600">Please provide your personal details</p>
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-2">Personal Information</h2>
+          <p className="text-gray-600">Please provide your personal details</p>
+        </div>
 
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-base">
-            Full Name
-          </Label>
-          <Input
-            id="name"
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
             name="name"
-            placeholder="Enter your full name"
-            value={formData.name}
-            onChange={handleInputChange}
-            onBlur={() => handleBlur("name")}
-            className={errors.name ? "border-red-500" : ""}
+            rules={{ required: "Name is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your full name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.name && touched.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-base">
-            Email Address
-          </Label>
-          <Input
-            id="email"
+          <FormField
+            control={form.control}
             name="email"
-            type="email"
-            placeholder="Enter your email address"
-            value={formData.email}
-            onChange={handleInputChange}
-            onBlur={() => handleBlur("email")}
-            className={errors.email ? "border-red-500" : ""}
+            rules={{ 
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Please enter a valid email address"
+              }
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Address</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="Enter your email address" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.email && touched.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
-        </div>
 
-        <div className="pt-6">
-          <Button type="submit">
-            Continue
-          </Button>
+          <div className="pt-6">
+            <Button type="submit">
+              Continue
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 

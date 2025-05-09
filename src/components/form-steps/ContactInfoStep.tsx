@@ -1,9 +1,16 @@
-import { useState } from "react";
-import type { FormData, FormErrors } from "../../types/form-types";
-import { validateContactInfo } from "../../utils/form-validation";
-import { Button } from "../ui/button";
-import { Label } from "../ui/Label";
+import { useForm } from "react-hook-form";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import type { FormData } from "../../types/form-types";
 import { Input } from "../ui/Input";
+import { Button } from "../ui/button";
 
 interface ContactInfoStepProps {
   formData: FormData;
@@ -18,105 +25,82 @@ const ContactInfoStep = ({
   onBack,
   onNext,
 }: ContactInfoStepProps) => {
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState({
-    address: false,
-    phone: false,
+  const form = useForm<Pick<FormData, "address" | "phone">>({
+    defaultValues: {
+      address: formData.address,
+      phone: formData.phone,
+    },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    updateFormData({ [name]: value });
-    
-    if (touched[name as keyof typeof touched]) {
-      const validationResult = validateContactInfo({
-        ...formData,
-        [name]: value,
-      });
-      setErrors((prev) => ({ ...prev, [name]: validationResult[name as keyof FormErrors] }));
-    }
-  };
-
-  const handleBlur = (field: keyof typeof touched) => {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-    const validationResult = validateContactInfo(formData);
-    setErrors((prev) => ({ ...prev, [field]: validationResult[field] }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const validationResult = validateContactInfo(formData);
-    setErrors(validationResult);
-    setTouched({ address: true, phone: true });
-    
-    if (Object.keys(validationResult).length === 0) {
-      onNext();
-    }
+  const handleSubmit = (data: Pick<FormData, "address" | "phone">) => {
+    updateFormData(data);
+    onNext();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Contact Information</h2>
-        <p className="text-gray-600">Let us know how to reach you</p>
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-2">Contact Information</h2>
+          <p className="text-gray-600">Let us know how to reach you</p>
+        </div>
 
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="address" className="text-base">
-            Address
-          </Label>
-          <Input
-            id="address"
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
             name="address"
-            placeholder="Enter your address"
-            value={formData.address}
-            onChange={handleInputChange}
-            onBlur={() => handleBlur("address")}
-            className={errors.address ? "border-red-500" : ""}
+            rules={{ required: "Address is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your address" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.address && touched.address && (
-            <p className="text-red-500 text-sm mt-1">{errors.address}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-base">
-            Phone Number
-          </Label>
-          <Input
-            id="phone"
+          <FormField
+            control={form.control}
             name="phone"
-            placeholder="Enter your phone number"
-            value={formData.phone}
-            onChange={handleInputChange}
-            onBlur={() => handleBlur("phone")}
-            className={errors.phone ? "border-red-500" : ""}
+            rules={{ 
+              required: "Phone number is required",
+              pattern: {
+                value: /^[0-9\-\+\s()]*$/,
+                message: "Phone number should contain only digits, spaces, and +()- characters"
+              }
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your phone number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.phone && touched.phone && (
-            <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-          )}
-        </div>
 
-        <div className="pt-6 flex gap-4">
-          <Button
-            type="button"
-            onClick={onBack}
-            variant="outline"
-            className="w-full"
-          >
-            Back
-          </Button>
-          <Button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700"
-          >
-            Continue
-          </Button>
+          <div className="pt-6 flex gap-4">
+            <Button
+              type="button"
+              onClick={onBack}
+              variant="outline"
+              className="w-full"
+            >
+              Back
+            </Button>
+            <Button
+              type="submit"
+              className="w-full"
+            >
+              Continue
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 

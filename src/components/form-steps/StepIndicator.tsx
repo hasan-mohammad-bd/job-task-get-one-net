@@ -27,7 +27,7 @@ const StepIndicator = ({ currentStep, totalSteps }: StepIndicatorProps) => {
             {index < totalSteps - 1 && (
               <div
                 className={cn(
-                  "h-1 w-16 md:w-24 lg:w-32",
+                  "h-1 w-20 md:w-28 lg:w-36",
                   index + 1 < currentStep
                     ? "bg-purple-500"
                     : "bg-purple-300"

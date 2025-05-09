@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 
-
-
-import type { FormData, FormErrors } from "../../types/form-types";
-import { validateCategories } from "../../utils/form-validation";
-import { Button } from "../ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import type { FormData } from "../../types/form-types";
 import { Checkbox } from "../ui/Checkbox";
-import { Label } from "../ui/Label";
-
+import { Button } from "../ui/button";
 
 interface CategoriesStepProps {
   formData: FormData;
@@ -36,85 +38,86 @@ const CategoriesStep = ({
   onBack,
   onNext,
 }: CategoriesStepProps) => {
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState(false);
+  const form = useForm<Pick<FormData, "categories">>({
+    defaultValues: {
+      categories: formData.categories,
+    },
+  });
 
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    let updatedCategories: string[];
-    
-    if (checked) {
-      updatedCategories = [...formData.categories, category];
-    } else {
-      updatedCategories = formData.categories.filter((c) => c !== category);
-    }
-    
-    updateFormData({ categories: updatedCategories });
-    
-    if (touched) {
-      const validationResult = validateCategories({ categories: updatedCategories });
-      setErrors({ categories: validationResult.categories });
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setTouched(true);
-    
-    const validationResult = validateCategories(formData);
-    setErrors(validationResult);
-    
-    if (Object.keys(validationResult).length === 0) {
-      onNext();
-    }
+  const handleSubmit = (data: Pick<FormData, "categories">) => {
+    updateFormData(data);
+    onNext();
   };
 
   return (
-<form onSubmit={handleSubmit}>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Categories</h2>
-        <p className="text-gray-600">Select interests that apply to you (select at least one)</p>
-      </div>
-
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {CATEGORIES.map((category) => (
-            <div key={category.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={category.id}
-                checked={formData.categories.includes(category.id)}
-                onChange={(e) => 
-                  handleCategoryChange(category.id, e.target.checked)
-                }
-              />
-              <Label htmlFor={category.id} className="text-base">
-                {category.label}
-              </Label>
-            </div>
-          ))}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-2">Categories</h2>
+          <p className="text-gray-600">Select interests that apply to you (select at least one)</p>
         </div>
-        
-        {errors.categories && touched && (
-          <p className="text-red-500 text-sm mt-1">{errors.categories}</p>
-        )}
 
-        <div className="pt-6 flex gap-4">
-          <Button
-            type="button"
-            onClick={onBack}
-            variant="outline"
-            className="w-full"
-          >
-            Back
-          </Button>
-          <Button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700"
-          >
-            Review
-          </Button>
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="categories"
+            rules={{ 
+              validate: value => value.length > 0 || "Please select at least one category" 
+            }}
+            render={() => (
+              <FormItem>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {CATEGORIES.map((category) => (
+                    <div key={category.id} className="flex items-center space-x-2">
+                      <Controller
+                        name="categories"
+                        control={form.control}
+                        render={({ field }) => {
+                          return (
+                            <Checkbox
+                              id={category.id}
+                              checked={field.value?.includes(category.id)}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                const updatedCategories = checked
+                                  ? [...field.value, category.id]
+                                  : field.value.filter((val) => val !== category.id);
+                                field.onChange(updatedCategories);
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                      <FormLabel htmlFor={category.id} className="text-base">
+                        {category.label}
+                      </FormLabel>
+                    </div>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="pt-6 flex gap-4">
+            <Button
+              type="button"
+              onClick={onBack}
+              variant="outline"
+              className="w-full"
+            >
+              Back
+            </Button>
+            <Button
+              type="submit"
+              className="w-full"
+            >
+              Review
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 

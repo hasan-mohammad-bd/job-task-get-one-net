@@ -23,7 +23,6 @@ const CATEGORIES = {
   webdev: "Web Development",
 };
 
-
 const ReviewStep = ({ formData, onBack, onSubmit, editStep }: ReviewStepProps) => {
   return (
     <div>
@@ -37,7 +36,7 @@ const ReviewStep = ({ formData, onBack, onSubmit, editStep }: ReviewStepProps) =
           <div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">Personal Information</h3>
-              <Button variant="outline" onClick={() => editStep(1)} className="text-blue-600 h-auto p-0">
+              <Button variant="link" onClick={() => editStep(1)} className="text-blue-600 h-auto p-0">
                 Edit
               </Button>
             </div>
@@ -56,7 +55,7 @@ const ReviewStep = ({ formData, onBack, onSubmit, editStep }: ReviewStepProps) =
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">Contact Information</h3>
-              <Button variant="outline" onClick={() => editStep(2)} className="text-blue-600 h-auto p-0">
+              <Button variant="link" onClick={() => editStep(2)} className="text-blue-600 h-auto p-0">
                 Edit
               </Button>
             </div>
@@ -75,7 +74,7 @@ const ReviewStep = ({ formData, onBack, onSubmit, editStep }: ReviewStepProps) =
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">Selected Categories</h3>
-              <Button variant="outline" onClick={() => editStep(3)} className="text-blue-600 h-auto p-0">
+              <Button variant="link" onClick={() => editStep(3)} className="text-blue-600 h-auto p-0">
                 Edit
               </Button>
             </div>
@@ -106,6 +105,7 @@ const ReviewStep = ({ formData, onBack, onSubmit, editStep }: ReviewStepProps) =
           <Button
             type="button"
             onClick={onSubmit}
+            variant="default"
             className="w-full bg-green-600 hover:bg-green-700"
           >
             Submit
