@@ -30,7 +30,7 @@ A React application that implements a multi-step form with validation, state per
 
 ```bash
 git clone https://github.com/hasan-mohammad-bd/job-task-get-one-net.git
-cd job-task-gotonnet
+cd job-task-get-one-net
 
 ```
 ### 2. Install Dependencies
