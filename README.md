@@ -2,6 +2,10 @@
 
 A React application that implements a multi-step form with validation, state persistence, and submission management.
 
+## 🚀 Live Preview
+
+👉 [Click here to view the live site](https://job-task-get-one-net.vercel.app/)
+
 ## Features
 
 - Multi-step form with 4 steps (Personal Information, Contact Information, Categories, Review)
