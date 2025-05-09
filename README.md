@@ -22,7 +22,7 @@ A React application that implements a multi-step form with validation, state per
 - **Radix UI** (`@radix-ui/react-slot`)
 - **Sonner** for toast notifications
 
-> **Note:** If you are using **Yup** for validation, ensure it's included in your dependencies.
+
 
 ## Getting Started
 
@@ -31,3 +31,16 @@ A React application that implements a multi-step form with validation, state per
 ```bash
 git clone https://github.com/hasan-mohammad-bd/job-task-get-one-net.git
 cd job-task-gotonnet
+
+```
+### 2. Install Dependencies
+```bash
+npm install
+```
+### 3. Start the Development Server
+
+Run the following command to start the development server:
+
+```bash
+npm run dev
+```
